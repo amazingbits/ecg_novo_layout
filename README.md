@@ -2,6 +2,8 @@
 
 > Proposta de novo layout para o site institucional da **ECG Sistemas**, empresa catarinense com 16+ anos no mercado de software para vidraçarias, esquadrias de alumínio e indústrias de têmpera.
 
+**[Ver demo ao vivo →](https://amazingbits.github.io/ecg_novo_layout/)**
+
 ---
 
 ## Sobre o projeto
