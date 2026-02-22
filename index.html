@@ -860,6 +860,106 @@
         .brazil-map-svg text.state-label.has-client {
             fill: rgba(236,253,255,0.98);
         }
+        /* Selected state on map */
+        .brazil-map-svg path.state.is-selected {
+            stroke: rgba(103,232,249,0.95) !important;
+            stroke-width: 2 !important;
+            filter: drop-shadow(0 0 7px rgba(56,189,248,0.55));
+        }
+
+        /* State indicator (appears above stats when a state is selected) */
+        .state-indicator {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 28px;
+            min-height: 28px;
+            opacity: 0;
+            transform: translateY(-8px);
+            transition: opacity 0.32s ease, transform 0.32s ease;
+            pointer-events: none;
+        }
+        .state-indicator.visible {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+        .state-indicator-dot {
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            background: rgba(103,232,249,1);
+            box-shadow: 0 0 8px rgba(56,189,248,0.9), 0 0 16px rgba(56,189,248,0.5);
+            flex-shrink: 0;
+            animation: dot-pulse 2s ease-in-out infinite;
+        }
+        @keyframes dot-pulse {
+            0%, 100% { box-shadow: 0 0 6px rgba(56,189,248,0.9), 0 0 14px rgba(56,189,248,0.4); }
+            50% { box-shadow: 0 0 12px rgba(103,232,249,1), 0 0 24px rgba(56,189,248,0.7); }
+        }
+        .state-indicator-name {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: rgba(103,232,249,0.95);
+            text-shadow: 0 0 14px rgba(56,189,248,0.65);
+            letter-spacing: 0.03em;
+        }
+        .state-indicator-reset {
+            background: none;
+            border: 1px solid rgba(56,189,248,0.3);
+            color: rgba(148,163,184,0.6);
+            border-radius: 20px;
+            padding: 3px 12px;
+            font-size: 0.72rem;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            cursor: pointer;
+            transition: border-color 0.2s, color 0.2s;
+            margin-left: auto;
+        }
+        .state-indicator-reset:hover {
+            border-color: rgba(103,232,249,0.6);
+            color: rgba(103,232,249,0.9);
+        }
+
+        /* Stats wrapper with scan line */
+        .coverage-stats-wrapper { position: relative; overflow: hidden; border-radius: var(--radius-md); }
+        .stats-scan-line {
+            position: absolute;
+            left: -5%; width: 110%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent 0%, rgba(56,189,248,0.15) 10%, rgba(103,232,249,0.95) 50%, rgba(56,189,248,0.15) 90%, transparent 100%);
+            top: -2px;
+            pointer-events: none;
+            opacity: 0;
+            z-index: 10;
+        }
+        .stats-scan-line.scanning { animation: scan-sweep 0.6s cubic-bezier(0.4,0,0.2,1) forwards; }
+        @keyframes scan-sweep {
+            0%   { top: -2px;   opacity: 1; }
+            85%  { opacity: 0.7; }
+            100% { top: 102%;   opacity: 0; }
+        }
+
+        /* Card neon flash on update */
+        @keyframes stat-neon-flash {
+            0%   { border-color: rgba(103,232,249,0.85); box-shadow: 0 0 0 1px rgba(103,232,249,0.35), 0 0 18px rgba(56,189,248,0.45), inset 0 0 18px rgba(56,189,248,0.08); background: rgba(56,189,248,0.11); }
+            45%  { border-color: rgba(56,189,248,0.5);   box-shadow: 0 0 0 1px rgba(56,189,248,0.2),  0 0 10px rgba(56,189,248,0.25); }
+            100% { border-color: rgba(255,255,255,0.08); box-shadow: none; background: rgba(255,255,255,0.05); }
+        }
+        .coverage-stat.stat-flash { animation: stat-neon-flash 0.85s ease-out forwards; }
+
+        /* Number neon flash */
+        @keyframes num-neon {
+            0%   { color: rgba(103,232,249,1); text-shadow: 0 0 8px rgba(56,189,248,0.9), 0 0 22px rgba(56,189,248,0.55); }
+            100% { color: var(--glass-accent); text-shadow: none; }
+        }
+        .coverage-stat-number.num-flash { animation: num-neon 0.85s ease-out forwards; }
+
+        /* Persistent subtle glow while a state is active */
+        #coverageStats.state-active .coverage-stat {
+            border-color: rgba(56,189,248,0.2);
+            box-shadow: 0 0 0 1px rgba(56,189,248,0.07), inset 0 0 14px rgba(56,189,248,0.04);
+        }
         .map-tooltip {
             position: absolute;
             z-index: 6;
@@ -1801,11 +1901,19 @@
                 <span class="section-label">Cobertura nacional</span>
                 <h2 id="coverage-title" class="section-title">Presente em todo o Brasil</h2>
                 <p class="section-subtitle" style="color:rgba(255,255,255,0.6)">De norte a sul, centenas de empresas confiam na ECG Sistemas para gerenciar suas operações diárias.</p>
-                <div class="coverage-stats" style="margin-top:36px">
-                    <div class="coverage-stat"><div class="coverage-stat-number">662+</div><div class="coverage-stat-label">Empresas ativas</div></div>
-                    <div class="coverage-stat"><div class="coverage-stat-number">27</div><div class="coverage-stat-label">Estados</div></div>
-                    <div class="coverage-stat"><div class="coverage-stat-number">300+</div><div class="coverage-stat-label">Cidades atendidas</div></div>
-                    <div class="coverage-stat"><div class="coverage-stat-number">18</div><div class="coverage-stat-label">Anos de história</div></div>
+                <div class="state-indicator" id="stateIndicator" aria-live="polite">
+                    <span class="state-indicator-dot"></span>
+                    <span class="state-indicator-name" id="stateIndicatorName"></span>
+                    <button class="state-indicator-reset" id="stateIndicatorReset" aria-label="Voltar para visão nacional">← Nacional</button>
+                </div>
+                <div class="coverage-stats-wrapper" style="margin-top:36px">
+                    <div class="stats-scan-line" id="statsScanLine"></div>
+                    <div class="coverage-stats" id="coverageStats">
+                        <div class="coverage-stat" id="statCard0"><div class="coverage-stat-number" id="statNum0">662+</div><div class="coverage-stat-label" id="statLabel0">Empresas ativas</div></div>
+                        <div class="coverage-stat" id="statCard1"><div class="coverage-stat-number" id="statNum1">27</div><div class="coverage-stat-label" id="statLabel1">Estados</div></div>
+                        <div class="coverage-stat" id="statCard2"><div class="coverage-stat-number" id="statNum2">300+</div><div class="coverage-stat-label" id="statLabel2">Cidades atendidas</div></div>
+                        <div class="coverage-stat" id="statCard3"><div class="coverage-stat-number" id="statNum3">18</div><div class="coverage-stat-label" id="statLabel3">Anos de história</div></div>
+                    </div>
                 </div>
             </div>
 
@@ -2450,31 +2558,151 @@ function buildStateLabels(svg) {
     });
 }
 
-function bindMapHoverEvents(svg) {
+// ── Coverage stats interaction ───────────────────────────────────────────────
+
+const stateDetails = {
+    sp: { cities: 89 }, mg: { cities: 41 }, pr: { cities: 28 }, ba: { cities: 22 },
+    sc: { cities: 19 }, go: { cities: 14 }, rs: { cities: 13 }, rj: { cities: 10 },
+    pe: { cities:  9 }, es: { cities:  8 }, ce: { cities:  7 }, pa: { cities:  6 },
+    df: { cities:  5 }, am: { cities:  3 },
+};
+
+const NATIONAL_STATS = [
+    { value: 662, suffix: '+', label: 'Empresas ativas' },
+    { value:  27, suffix: '',  label: 'Estados' },
+    { value: 300, suffix: '+', label: 'Cidades atendidas' },
+    { value:  18, suffix: '',  label: 'Anos de história' },
+];
+
+let activeStateCode = null;
+
+function animateNumber(el, to, suffix, duration = 680) {
+    el.classList.remove('num-flash');
+    void el.offsetWidth;
+    el.classList.add('num-flash');
+    const start = performance.now();
+    const tick = (now) => {
+        const t = Math.min((now - start) / duration, 1);
+        const eased = 1 - (1 - t) ** 3;
+        el.textContent = Math.round(to * eased) + suffix;
+        if (t < 1) requestAnimationFrame(tick);
+        else el.textContent = to + suffix;
+    };
+    requestAnimationFrame(tick);
+}
+
+function updateStats(statsData) {
+    const scanLine = document.getElementById('statsScanLine');
+    if (scanLine) { scanLine.classList.remove('scanning'); void scanLine.offsetWidth; scanLine.classList.add('scanning'); }
+    statsData.forEach((s, i) => {
+        setTimeout(() => {
+            const card   = document.getElementById('statCard' + i);
+            const numEl  = document.getElementById('statNum'  + i);
+            const lblEl  = document.getElementById('statLabel'+ i);
+            if (!card || !numEl || !lblEl) return;
+            card.classList.remove('stat-flash'); void card.offsetWidth; card.classList.add('stat-flash');
+            lblEl.textContent = s.label;
+            animateNumber(numEl, s.value, s.suffix);
+        }, i * 85);
+    });
+}
+
+function showStateStats(code) {
+    const clients = coverageDataByState[code] || 0;
+    const total   = Object.values(coverageDataByState).reduce((a, b) => a + b, 0);
+    const pct     = total > 0 ? Math.round((clients / total) * 100) : 0;
+    const sorted  = Object.entries(coverageDataByState).filter(([, v]) => v > 0).sort(([, a], [, b]) => b - a);
+    const rank    = sorted.findIndex(([k]) => k === code) + 1;
+    const details = stateDetails[code] || { cities: Math.max(1, Math.round(clients * 0.45)) };
+
+    updateStats([
+        { value: clients,       suffix: '',  label: 'Clientes no estado' },
+        { value: rank,          suffix: 'º', label: 'Ranking nacional'   },
+        { value: details.cities,suffix: '',  label: 'Cidades atendidas'  },
+        { value: pct,           suffix: '%', label: 'Do total nacional'  },
+    ]);
+
+    const indicator = document.getElementById('stateIndicator');
+    const name      = document.getElementById('stateIndicatorName');
+    if (name) name.textContent = (coverageStateNames[code] || code.toUpperCase()) + ' (' + code.toUpperCase() + ')';
+    if (indicator) indicator.classList.add('visible');
+
+    document.getElementById('coverageStats')?.classList.add('state-active');
+}
+
+function showNationalStats() {
+    updateStats(NATIONAL_STATS);
+    document.getElementById('stateIndicator')?.classList.remove('visible');
+    document.getElementById('coverageStats')?.classList.remove('state-active');
+    if (coverageSvg && activeStateCode) {
+        coverageSvg.querySelector(`path[data-state="${activeStateCode}"]`)?.classList.remove('is-selected');
+    }
+    activeStateCode = null;
+}
+
+document.getElementById('stateIndicatorReset')?.addEventListener('click', showNationalStats);
+
+// ── Map interactions (hover = desktop, touch = mobile) ──────────────────────
+
+function bindMapInteractions(svg) {
+    // Browsers on touch devices fire simulated mouseenter ~300ms after touchstart.
+    // We track the last touch timestamp to ignore those ghost events.
+    let lastTouchTime = 0;
+
     svg.querySelectorAll('path.state').forEach(path => {
+
+        // ── DESKTOP: hover ───────────────────────────────────────────────────
         path.addEventListener('mouseenter', event => {
+            if (Date.now() - lastTouchTime < 600) return; // skip ghost mouse events on mobile
             if (!path.classList.contains('has-client')) return;
             const code = path.dataset.state;
             const clients = Number(path.dataset.clients || 0);
-            if (clients <= 0 || !mapTooltip) return;
+            if (clients <= 0) return;
             path.classList.add('is-hovered');
-            const stateName = coverageStateNames[code] || code.toUpperCase();
-            const clientText = `${formatNumber(clients)} ${clients === 1 ? 'cliente' : 'clientes'}`;
-            mapTooltip.innerHTML = `<strong>${stateName} (${code.toUpperCase()})</strong><br>${clientText}`;
-            positionMapTooltip(event);
-            mapTooltip.classList.add('visible');
+            if (mapTooltip) {
+                const stateName = coverageStateNames[code] || code.toUpperCase();
+                const clientText = `${formatNumber(clients)} ${clients === 1 ? 'cliente' : 'clientes'}`;
+                mapTooltip.innerHTML = `<strong>${stateName} (${code.toUpperCase()})</strong><br>${clientText}`;
+                positionMapTooltip(event);
+                mapTooltip.classList.add('visible');
+            }
+            showStateStats(code);
         });
 
         path.addEventListener('mousemove', event => {
+            if (Date.now() - lastTouchTime < 600) return;
             if (!path.classList.contains('has-client')) return;
             positionMapTooltip(event);
         });
 
         path.addEventListener('mouseleave', () => {
+            if (Date.now() - lastTouchTime < 600) return;
             path.classList.remove('is-hovered');
             hideMapTooltip();
+            showNationalStats();
         });
+
+        // ── MOBILE: tap ──────────────────────────────────────────────────────
+        path.addEventListener('touchstart', e => {
+            if (!path.classList.contains('has-client')) return;
+            lastTouchTime = Date.now();
+            e.stopPropagation(); // prevent document listener from resetting stats
+            const code = path.dataset.state;
+            // Deselect previous state if different
+            if (activeStateCode && activeStateCode !== code) {
+                svg.querySelector(`path[data-state="${activeStateCode}"]`)?.classList.remove('is-selected');
+            }
+            if (activeStateCode === code) return; // already showing this state
+            path.classList.add('is-selected');
+            activeStateCode = code;
+            showStateStats(code);
+        }, { passive: true });
     });
+
+    // Tap outside any state → reset to national (mobile)
+    document.addEventListener('touchstart', () => {
+        if (activeStateCode !== null) showNationalStats();
+    }, { passive: true });
 }
 
 async function initCoverageMap() {
@@ -2503,7 +2731,7 @@ async function initCoverageMap() {
         mapViewport.replaceChildren(svg);
         coverageSvg = svg;
         buildStateLabels(svg);
-        bindMapHoverEvents(svg);
+        bindMapInteractions(svg);
         applyCoverageData();
     } catch (error) {
         console.error('Erro ao carregar mapa de cobertura:', error);
