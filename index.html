@@ -2699,9 +2699,13 @@ function bindMapInteractions(svg) {
         }, { passive: true });
     });
 
-    // Tap outside any state → reset to national (mobile)
-    document.addEventListener('touchstart', () => {
-        if (activeStateCode !== null) showNationalStats();
+    // Tap outside any state → reset to national (mobile).
+    // Distingue toque simples de scroll: só reseta se não houve movimento.
+    let docTouchMoved = false;
+    document.addEventListener('touchstart', () => { docTouchMoved = false; }, { passive: true });
+    document.addEventListener('touchmove',  () => { docTouchMoved = true;  }, { passive: true });
+    document.addEventListener('touchend', () => {
+        if (!docTouchMoved && activeStateCode !== null) showNationalStats();
     }, { passive: true });
 }
 
