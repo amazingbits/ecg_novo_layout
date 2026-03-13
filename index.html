@@ -230,9 +230,20 @@
         }
 
         /* HERO */
-        .hero { min-height: 100vh; display: flex; align-items: center; padding-top: 100px; position: relative; overflow: hidden; }
-        .hero::before { content:''; position: absolute; top: -200px; right: -200px; width: 700px; height: 700px; border-radius: 50%; background: radial-gradient(circle, rgba(14,165,233,0.12), transparent 70%); pointer-events: none; }
-        .hero::after { content:''; position: absolute; bottom: -100px; left: -150px; width: 500px; height: 500px; border-radius: 50%; background: radial-gradient(circle, rgba(6,182,212,0.08), transparent 70%); pointer-events: none; }
+        .hero { min-height: 100vh; display: flex; align-items: center; padding-top: 100px; position: relative; overflow: hidden; background: transparent; }
+        .hero-bg-image {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: -2;
+            background: url('./assets/custom-bg.png') center/cover no-repeat;
+        }
+        .hero-bg-overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;
+            /* Fades linearly into #f8fbff */
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.88) 0%, rgba(240, 249, 255, 0.65) 45%, rgba(248, 251, 255, 1) 100%);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+        }
+        .hero::before { content:''; position: absolute; top: -200px; right: -200px; width: 700px; height: 700px; border-radius: 50%; background: radial-gradient(circle, rgba(14,165,233,0.12), transparent 70%); pointer-events: none; z-index: -1; }
+        .hero::after { content:''; position: absolute; bottom: -100px; left: -150px; width: 500px; height: 500px; border-radius: 50%; background: radial-gradient(circle, rgba(6,182,212,0.08), transparent 70%); pointer-events: none; z-index: -1; }
         .hero-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; }
         .hero-badge { display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px; background: rgba(16,185,129,0.1); color: var(--success); border-radius: 100px; font-size: 0.8rem; font-weight: 600; margin-bottom: 24px; border: 1px solid rgba(16,185,129,0.2); }
         .hero-badge .pulse { width: 8px; height: 8px; background: var(--success); border-radius: 50%; animation: pulse 2s ease-in-out infinite; }
@@ -324,7 +335,7 @@
         .social-proof-bar {
             position: relative; overflow: hidden; isolation: isolate;
             padding: 52px 0;
-            border-top: 1px solid rgba(0,0,0,0.04); border-bottom: 1px solid rgba(0,0,0,0.04);
+            border-bottom: 1px solid rgba(0,0,0,0.04);
             background: linear-gradient(180deg, #f8fbff 0%, #f2f8ff 100%);
         }
         .social-proof-video {
@@ -1599,6 +1610,8 @@
 
 <!-- HERO -->
 <section class="hero" id="home" aria-labelledby="hero-title">
+    <div class="hero-bg-image" aria-hidden="true"></div>
+    <div class="hero-bg-overlay" aria-hidden="true"></div>
     <div class="container">
         <div class="hero-grid">
             <div class="hero-content">
@@ -1617,7 +1630,10 @@
                 </div>
                 <div class="hero-proof">
                     <div class="proof-avatars">
-                        <div class="proof-avatar">VF</div><div class="proof-avatar">AL</div><div class="proof-avatar">WM</div><div class="proof-avatar">AP</div><div class="proof-avatar">+</div>
+                        <img src="./assets/logos/vidro_form.png" alt="Vidro Form" class="proof-avatar" style="background:none; object-fit:cover; padding:0;">
+                        <img src="./assets/logos/al_esquadrias.png" alt="AL Esquadrias" class="proof-avatar" style="background:none; object-fit:cover; padding:0;">
+                        <img src="./assets/logos/all_pro.png" alt="All Pro" class="proof-avatar" style="background:none; object-fit:cover; padding:0;">
+                        <div class="proof-avatar">+</div>
                     </div>
                     <div class="proof-text">
                         <span style="color:#f59e0b">&#9733;&#9733;&#9733;&#9733;&#9733;</span> <strong>4.9/5</strong> no Google<br>com 152+ avaliações
@@ -1628,25 +1644,25 @@
                 <div class="hero-3d-container">
                     <model-viewer
                         id="hero-model-viewer"
-                        src="./modelo_ecg_vidro.glb"
-                        alt="Logo ECG Sistemas 3D"
+                        src="./assets/modelo_device_hologram_v14.glb"
+                        alt="Monitor e Tablet Compactos Holográficos"
                         auto-rotate
                         auto-rotate-delay="0"
-                        rotation-per-second="25deg"
+                        rotation-per-second="10deg"
                         interaction-prompt="none"
                         camera-controls
                         disable-zoom
                         disable-pan
-                        shadow-intensity="0.72"
-                        shadow-softness="0.9"
-                        exposure="1.15"
+                        shadow-intensity="1.2"
+                        shadow-softness="0.5"
+                        exposure="1.4"
                         environment-image="https://modelviewer.dev/shared-assets/environments/aircraft_workshop_01_1k.hdr"
                         skybox-height="0"
                         camera-target="auto auto auto"
-                        camera-orbit="0deg 70deg auto"
-                        field-of-view="30deg"
-                        min-camera-orbit="auto 70deg auto"
-                        max-camera-orbit="auto 70deg auto"
+                        camera-orbit="40deg 75deg auto"
+                        field-of-view="40deg"
+                        min-camera-orbit="auto 75deg auto"
+                        max-camera-orbit="auto 75deg auto"
                         tone-mapping="aces"
                         style="background-color: transparent;"
                     >
@@ -1939,17 +1955,17 @@
                 <article class="testimonial-card testimonial-slide">
                     <div class="testimonial-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
                     <blockquote>"Esse sistema de gestão é incrível, já utilizo há muitos anos e me ajudou a organizar toda a empresa do zero."</blockquote>
-                    <div class="testimonial-author"><div class="testimonial-avatar">VF</div><div><div class="testimonial-author-name">Vidroform</div><div class="testimonial-author-company">Vidraçaria</div></div></div>
+                    <div class="testimonial-author"><img src="./assets/logos/vidro_form.png" alt="Vidro Form" class="testimonial-avatar" style="background:none; object-fit:cover;" /><div><div class="testimonial-author-name">Vidroform</div><div class="testimonial-author-company">Vidraçaria</div></div></div>
                 </article>
                 <article class="testimonial-card testimonial-slide">
                     <div class="testimonial-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
                     <blockquote>"Adoro o Sistema ECG, ele tem diversas opções, é bem completo. O suporte sempre resolve rápido."</blockquote>
-                    <div class="testimonial-author"><div class="testimonial-avatar">AL</div><div><div class="testimonial-author-name">AL Esquadrias</div><div class="testimonial-author-company">Esquadrias de Alumínio</div></div></div>
+                    <div class="testimonial-author"><img src="./assets/logos/al_esquadrias.png" alt="AL Esquadrias" class="testimonial-avatar" style="background:none; object-fit:cover;" /><div><div class="testimonial-author-name">AL Esquadrias</div><div class="testimonial-author-company">Esquadrias de Alumínio</div></div></div>
                 </article>
                 <article class="testimonial-card testimonial-slide">
                     <div class="testimonial-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
                     <blockquote>"É o melhor sistema. A gente usa no escritório, na rua, em qualquer lugar. Muito fácil de mexer."</blockquote>
-                    <div class="testimonial-author"><div class="testimonial-avatar">AP</div><div><div class="testimonial-author-name">All Pro</div><div class="testimonial-author-company">Vidraçaria e Serralheria</div></div></div>
+                    <div class="testimonial-author"><img src="./assets/logos/all_pro.png" alt="All Pro" class="testimonial-avatar" style="background:none; object-fit:cover;" /><div><div class="testimonial-author-name">All Pro</div><div class="testimonial-author-company">Vidraçaria e Serralheria</div></div></div>
                 </article>
             </div>
         </div>
@@ -2109,13 +2125,23 @@
 const header = document.getElementById('header');
 window.addEventListener('scroll', () => header.classList.toggle('scrolled', window.scrollY > 50));
 
-// Troca de modelo 3D via query string: ?vidro=normal → modelo_ecg.glb | ?vidro=glass (padrão) → modelo_ecg_vidro.glb
+// Troca de modelo 3D via query string:
+// ausente ou ?vidro=padrao -> mantém modelo_device_hologram_v14.glb (definido no HTML)
+// ?vidro=glass -> modelo_ecg_vidro.glb
+// ?vidro=normal -> modelo_ecg.glb
 (function() {
     const mv = document.getElementById('hero-model-viewer');
     if (!mv) return;
     const param = new URLSearchParams(window.location.search).get('vidro');
-    if (param === 'normal') mv.setAttribute('src', './modelo_ecg.glb');
-    // 'glass' ou ausente: mantém modelo_ecg_vidro.glb definido no HTML
+    if (param === 'glass') {
+        mv.setAttribute('src', './assets/modelo_ecg_vidro.glb');
+        mv.setAttribute('field-of-view', 'auto');
+        mv.setAttribute('scale', '0.7 0.7 0.7');
+    } else if (param === 'normal') {
+        mv.setAttribute('src', './assets/modelo_ecg.glb');
+        mv.setAttribute('field-of-view', 'auto');
+        mv.setAttribute('scale', '0.7 0.7 0.7');
+    }
 })();
 
 // Hero 3D model loader and camera lock
